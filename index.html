@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+  <head>
+      <meta charset='UTF-8' />
+      <meta http-equiv='content-type' content='text/html; charset=utf-8' />
+ 
+      <title>Leaflet Pouch Demo</title>
+    
+      <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+      <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+      <link rel="stylesheet" href="demo.css" />
+    
+      <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+      <script src="src/pouch-plugin.js"></script> 
+      <script src="src/filecontrol.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var map = L.map('map').setView([39.74739, -105], 13);
+      L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
+        key: '8ee2a50541944fb9bcedded5165f09d9'
+      }).addTo(map);
+
+      var onEachFeature = function(feature, layer) {
+        var popup = '';
+        for (var prop in feature.properties)
+          if (feature.properties.hasOwnProperty(prop))
+            popup = popup + '<p>' + prop + ' : ' + feature.properties[prop] + '</p>';
+
+        layer.bindPopup(popup);
+      }
+
+      var lyrPouch = L.geoJson.Pouch({
+        style: function (feature) {
+          return feature.properties && feature.properties.style;
+        },
+
+        onEachFeature: onEachFeature,
+
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, {
+            radius: 8,
+            fillColor: "#ff7800",
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+          });
+        },
+        cb : function(msg) {
+          switch (msg.cmd) {
+            case 'centre' :
+              map.panTo(new L.LatLng(msg.value[1], msg.value[0]));
+              break;
+            default:
+              break;
+          }
+        }
+      });
+      lyrPouch.addTo(map);
+
+      var onselect = function(file){
+        lyrPouch.load(file, 'gpkg');        
+      };
+
+      L.Control.FileLoad.LABEL = '<i class="fa fa-folder-open"></i>';
+      L.Control.fileLoad({"onselect" : onselect}).addTo(map);
+    </script>
+  </body>
+</html>
