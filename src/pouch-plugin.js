@@ -4,7 +4,7 @@ L.GeoJSON.Pouch = L.GeoJSON.extend({
     var lyr = this;
     L.Util.setOptions(this, options);
     this._layers = {};
-    this.worker = new Worker('../src/pouch_worker.js'); 
+    this.worker = new Worker('src/pouch_worker.js'); 
     this.worker.onmessage = function(event) {
       lyr.update(event.data);
     }; 
