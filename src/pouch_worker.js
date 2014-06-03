@@ -19,7 +19,7 @@ onmessage = function (event) {
       break;
     default:
       self.postMessage({"cmd" : "error", "value" : "Unknown command: " + data.msg});
-  };
+  }
 };
 
 loadGpkg = function(file){
@@ -54,8 +54,6 @@ loadGpkg = function(file){
           case 'max_y':
             maxy = obj.value;
             break;
-          default:
-            break;
         }
       }
 
@@ -72,11 +70,9 @@ loadGpkg = function(file){
       // assume geometry is in column 'geom'
       var vals = gpkg.exec('SELECT * from ' + dbName);
       var geoms = gpkg.exec('SELECT hex("geom") from ' + dbName);
-      // parse the geoms to WKT
-      var rdr = new spatialitegeom();
-      for (var i = 0; i < geoms.length; i++){
-        var val =  geoms[i][0].value;
-        var wkt = rdr.read(parseHexString(val));
+      geoms.forEach(function (geom) {
+        var val =  geom[0].value;
+        var wkt = spatialitegeom(parseHexString(val));
         var id = PouchDB.utils.uuid();
         var rev;
         var props = {};
@@ -84,14 +80,14 @@ loadGpkg = function(file){
         
         for (var j = 0; j < v.length; j++) {
           var p = v[j];
-          if (p.column == 'geom')
+          if (p.column === 'geom')
             continue;
-          else if (p.column == 'id')
+          else if (p.column === 'id')
             id = p.value;
-          else if (p.column == 'rev')
+          else if (p.column === 'rev')
             rev = p.value;
           else
-            props[p.column] = p.value;
+            props[p.column] = decodeURIComponent(p.value);
         }
 
         var geoDoc = {
@@ -106,13 +102,13 @@ loadGpkg = function(file){
           
         db.put(geoDoc).then(
           function(resp) {
-            load(resp.id)
+            load(resp.id);
           });
-      }
+      });
 
       gpkg.close();
     }
-  }
+  };
   reader.readAsBinaryString(file);
 };
 
