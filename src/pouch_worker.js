@@ -87,7 +87,7 @@ loadGpkg = function(file){
           else if (p.column === 'rev')
             rev = p.value;
           else
-            props[p.column] = p.value;
+            props[p.column] = decodeURIComponent(p.value);
         }
 
         var geoDoc = {
