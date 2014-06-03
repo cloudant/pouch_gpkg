@@ -1,14 +1,13 @@
 // http://www.gaia-gis.it/gaia-sins/BLOB-Geometry.html
 
-function spatialitegeom() {};
 
-spatialitegeom.prototype.read = function(buf){
+function spatialitegeom(buf){
   if (buf instanceof ArrayBuffer){
     var dv = new DataView(buf);
-    if (dv.getInt16(0, false) == 0x4750) { 
+    if (dv.getInt16(0, false) === 0x4750) { 
       var version = dv.getInt8(2);
-      var flags = dv.getInt8(3)
-      if ((version == 0x00) && (flags == 0x01)) {
+      var flags = dv.getInt8(3);
+      if ((version === 0x00) && (flags === 0x01)) {
         var srsId = dv.getInt32(4, false);
         var littleEndian = false;
         if (dv.getInt8(8) == 0x01)
@@ -25,7 +24,7 @@ spatialitegeom.prototype.read = function(buf){
           default:
             throw('only point geometries are currently supported');
             break;
-        };
+        }
 
         return result;
       } else throw 'envelope not supported';
@@ -34,4 +33,4 @@ spatialitegeom.prototype.read = function(buf){
   } else {
     throw 'spatialitegeom read requires an arraybuffer';
   }
-};
+}

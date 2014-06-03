@@ -31,8 +31,6 @@ L.GeoJSON.Pouch = L.GeoJSON.extend({
         console.log(msg);
         alert(msg.value);
         break;
-      default:
-        break;
     }
   },
   load: function(file, type){
